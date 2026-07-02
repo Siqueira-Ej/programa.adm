@@ -1,0 +1,136 @@
+// Estado da Aplicação (Dados simulados iniciais)
+let empresa = {
+    receita: 150000.00,
+    despesasGerais: 25000.00,
+    funcionarios: [
+        { id: 1, nome: "Carlos Henrique", cargo: "Gerente de Projetos", salarioBruto: 12000.00 },
+        { id: 2, nome: "Mariana Souza", cargo: "Desenvolvedora Frontend", salarioBruto: 6500.00 }
+    ]
+};
+
+// Elementos do DOM
+document.getElementById('form-caixa').addEventListener('submit', atualizarCaixa);
+document.getElementById('form-funcionario').addEventListener('submit', cadastrarFuncionario);
+
+// Inicializar aplicação
+window.addEventListener('DOMContentLoaded', () => {
+    atualizarDashboard();
+});
+
+// Formatação de Moeda
+function formatarMoeda(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Atualiza todas as métricas da tela
+function atualizarDashboard() {
+    // Calcular total da folha de pagamento (Salários Brutos)
+    const totalFolha = empresa.funcionarios.reduce((acc, func) => acc + func.salarioBruto, 0);
+    
+    // O valor real em caixa da empresa é: Receitas - (Despesas Gerais + Folha de Pagamento)
+    const saldoTotal = empresa.receita - (empresa.despesasGerais + totalFolha);
+
+    // Atualizar UI
+    document.getElementById('txt-receita').innerText = formatarMoeda(empresa.receita);
+    document.getElementById('txt-despesa').innerText = formatarMoeda(empresa.despesasGerais);
+    document.getElementById('txt-folha').innerText = formatarMoeda(totalFolha);
+    document.getElementById('txt-saldo').innerText = formatarMoeda(saldoTotal);
+    document.getElementById('txt-qtd-funcs').innerText = empresa.funcionarios.length;
+
+    renderizarTabela();
+}
+
+// Adicionar Receitas ou Despesas por formulário
+function atualizarCaixa(e) {
+    e.preventDefault();
+    const inputReceita = parseFloat(document.getElementById('input-receita').value) || 0;
+    const inputDespesa = parseFloat(document.getElementById('input-despesa').value) || 0;
+
+    empresa.receita += inputReceita;
+    empresa.despesasGerais += inputDespesa;
+
+    // Resetar campos
+    document.getElementById('form-caixa').reset();
+    atualizarDashboard();
+}
+
+// Cadastrar Novo Funcionário
+function cadastrarFuncionario(e) {
+    e.preventDefault();
+    const nome = document.getElementById('nome-func').value;
+    const cargo = document.getElementById('cargo-func').value;
+    const salarioBruto = parseFloat(document.getElementById('salario-func').value);
+
+    const novoFunc = {
+        id: empresa.funcionarios.length > 0 ? empresa.funcionarios[empresa.funcionarios.length - 1].id + 1 : 1,
+        nome,
+        cargo,
+        salarioBruto
+    };
+
+    empresa.funcionarios.push(novoFunc);
+    document.getElementById('form-funcionario').reset();
+    atualizarDashboard();
+}
+
+// Renderiza a lista de funcionários com botões de ação
+function renderizarTabela() {
+    const tabela = document.getElementById('tabela-funcionarios');
+    tabela.innerHTML = '';
+
+    empresa.funcionarios.forEach(func => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>#${func.id}</td>
+            <td><strong>${func.nome}</strong></td>
+            <td>${func.cargo}</td>
+            <td>${formatarMoeda(func.salarioBruto)}</td>
+            <td>
+                <button onclick="gerarContracheque(${func.id})" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.85rem;">Ver Contracheque</button>
+                <button onclick="demitirFuncionario(${func.id})" class="btn btn-danger">Demitir</button>
+            </td>
+        `;
+        tabela.appendChild(tr);
+    });
+}
+
+// Remover Funcionário
+function demitirFuncionario(id) {
+    if(confirm("Tem certeza que deseja remover este funcionário?")) {
+        empresa.funcionarios = empresa.funcionarios.filter(f => f.id !== id);
+        atualizarDashboard();
+        fecharContracheque();
+    }
+}
+
+// Lógica de cálculo e exibição do Contracheque
+function gerarContracheque(id) {
+    const func = empresa.funcionarios.find(f => f.id === id);
+    if (!func) return;
+
+    // Descontos Simulado (INSS 11% e IRRF 7.5% fictícios para demonstração simples)
+    const inss = func.salarioBruto * 0.11;
+    const irrf = func.salarioBruto * 0.075;
+    const totalDescontos = inss + irrf;
+    const salarioLiquido = func.salarioBruto - totalDescontos;
+
+    const container = document.getElementById('conteudo-contracheque');
+    container.innerHTML = `
+        <div class="ct-linha"><strong>Funcionário:</strong> <span>${func.nome} (ID: ${func.id})</span></div>
+        <div class="ct-linha"><strong>Cargo:</strong> <span>${func.cargo}</span></div>
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ccc;">
+        <div class="ct-linha" style="color: green;"><strong>(+) Salário Bruto Base:</strong> <span>${formatarMoeda(func.salarioBruto)}</span></div>
+        <div class="ct-linha" style="color: red;"><strong>(-) Desconto INSS (11%):</strong> <span>${formatarMoeda(inss)}</span></div>
+        <div class="ct-linha" style="color: red;"><strong>(-) Desconto IRRF (7.5%):</strong> <span>${formatarMoeda(irrf)}</span></div>
+        <div class="ct-linha ct-total"><strong>(=) SALÁRIO LÍQUIDO A RECEBER:</strong> <span>${formatarMoeda(salarioLiquido)}</span></div>
+    `;
+
+    const areaContracheque = document.getElementById('area-contracheque');
+    areaContracheque.classList.remove('hidden');
+    areaContracheque.scrollIntoView({ behavior: 'smooth' });
+}
+
+function fecharContracheque() {
+    document.getElementById('area-contracheque').classList.add('hidden');
+}
+
