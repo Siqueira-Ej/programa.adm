@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Corp - Sistema de Gestão Financeira e RH</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>ERP Corp Internal System</h1>
+        <p>Gestão de Receitas, Despesas, Cargos e Folha de Pagamento</p>
+    </header>
+
+    <main class="container">
+        <section class="card dashboard">
+            <h2>Dashboard da Empresa</h2>
+            <div class="metrics-grid">
+                <div class="metric-box receita">
+                    <h3>Receita Bruta</h3>
+                    <p id="txt-receita">R$ 0,00</p>
+                </div>
+                <div class="metric-box despesa">
+                    <h3>Despesas Gerais</h3>
+                    <p id="txt-despesa">R$ 0,00</p>
+                </div>
+                <div class="metric-box folha">
+                    <h3>Folha de Pagamento</h3>
+                    <p id="txt-folha">R$ 0,00</p>
+                </div>
+                <div class="metric-box valor-empresa">
+                    <h3>Valor em Caixa (Saldo)</h3>
+                    <p id="txt-saldo">R$ 0,00</p>
+                </div>
+            </div>
+            <div class="info-adicional">
+                <p><strong>Total de Funcionários:</strong> <span id="txt-qtd-funcs">0</span></p>
+            </div>
+        </section>
+
+        <div class="two-columns">
+            <section class="card">
+                <h2>Atualizar Caixa da Empresa</h2>
+                <form id="form-caixa">
+                    <div class="form-group">
+                        <label for="input-receita">Adicionar Receita (R$):</label>
+                        <input type="number" id="input-receita" step="0.01" min="0" placeholder="Ex: 50000">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-despesa">Adicionar Despesa Geral (R$):</label>
+                        <input type="number" id="input-despesa" step="0.01" min="0" placeholder="Ex: 12000">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Atualizar Finanças</button>
+                </form>
+            </section>
+
+            <section class="card">
+                <h2>Contratar Funcionário / Definir Cargo</h2>
+                <form id="form-funcionario">
+                    <div class="form-group">
+                        <label for="nome-func">Nome do Funcionário:</label>
+                        <input type="text" id="nome-func" required placeholder="Ex: Ana Silva">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargo-func">Cargo:</label>
+                        <input type="text" id="cargo-func" required placeholder="Ex: Desenvolvedora Senior">
+                    </div>
+                    <div class="form-group">
+                        <label for="salario-func">Salário Bruto (R$):</label>
+                        <input type="number" id="salario-func" step="0.01" min="0" required placeholder="Ex: 8500">
+                    </div>
+                    <button type="submit" class="btn btn-success">Cadastrar e Contratar</button>
+                </form>
+            </section>
+        </div>
+
+        <section class="card">
+            <h2>Quadro de Funcionários e Emissão de Contracheque</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Salário Bruto</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-funcionarios">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="area-contracheque" class="card contracheque hidden">
+            <div class="contracheque-header">
+                <h2>CONTRACHEQUE (Demonstrativo de Pagamento)</h2>
+                <button onclick="fecharContracheque()" class="btn-fechar">&times;</button>
+            </div>
+            <div class="contracheque-body" id="conteudo-contracheque">
+                </div>
+            <button onclick="window.print()" class="btn btn-secondary">Imprimir Recibo</button>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
+
